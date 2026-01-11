@@ -15,7 +15,7 @@ router = APIRouter()
 
 @router.post(
     '/', 
-    summary='Criar um novo atleta',
+    summary='Criar novo atleta',
     status_code=status.HTTP_201_CREATED,
     response_model=AtletaOut
 )
@@ -72,7 +72,9 @@ async def post(
 async def query(db_session: DatabaseDependency) -> list[AtletaOut]:
     atletas: list[AtletaOut] = (await db_session.execute(select(AtletaModel))).scalars().all()
     
-    return [AtletaOut.model_validate(atleta) for atleta in atletas]
+    return [AtletaOut.model_validate(atleta) for atleta in atletas] if atletas else []
+
+
 
 
 @router.get(
@@ -83,7 +85,7 @@ async def query(db_session: DatabaseDependency) -> list[AtletaOut]:
 )
 async def get(id: UUID4, db_session: DatabaseDependency) -> AtletaOut:
     atleta: AtletaOut = (
-        await db_session.execute(select(AtletaModel).filter_by(id=id))
+        await db_session.execute(select(AtletaModel).filter_by(id=str(id)))
     ).scalars().first()
 
     if not atleta:
@@ -103,7 +105,7 @@ async def get(id: UUID4, db_session: DatabaseDependency) -> AtletaOut:
 )
 async def patch(id: UUID4, db_session: DatabaseDependency, atleta_up: AtletaUpdate = Body(...)) -> AtletaOut:
     atleta: AtletaOut = (
-        await db_session.execute(select(AtletaModel).filter_by(id=id))
+        await db_session.execute(select(AtletaModel).filter_by(id=str(id)))
     ).scalars().first()
 
     if not atleta:
@@ -129,7 +131,7 @@ async def patch(id: UUID4, db_session: DatabaseDependency, atleta_up: AtletaUpda
 )
 async def delete(id: UUID4, db_session: DatabaseDependency) -> None:
     atleta: AtletaOut = (
-        await db_session.execute(select(AtletaModel).filter_by(id=id))
+        await db_session.execute(select(AtletaModel).filter_by(id=str(id)))
     ).scalars().first()
 
     if not atleta:
@@ -137,6 +139,8 @@ async def delete(id: UUID4, db_session: DatabaseDependency) -> None:
             status_code=status.HTTP_404_NOT_FOUND, 
             detail=f'Atleta não encontrado no id: {id}'
         )
-    
+
     await db_session.delete(atleta)
     await db_session.commit()
+        
+        

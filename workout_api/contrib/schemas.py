@@ -1,12 +1,12 @@
 from typing import Annotated
-from pydantic import UUID4, BaseModel, Field
 from datetime import datetime
+from pydantic import UUID4, BaseModel, Field
 
 
 class BaseSchema(BaseModel):
     class Config:
         extra = 'forbid'
-        from_attributes = True
+        from_attributes = True # Permite a criação do schema a partir de um modelo ORM
 
 
 class OutMixin(BaseSchema):

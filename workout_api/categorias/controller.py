@@ -48,7 +48,7 @@ async def query(db_session: DatabaseDependency) -> list[CategoriaOut]:
 )
 async def get(id: UUID4, db_session: DatabaseDependency) -> CategoriaOut:
     categoria: CategoriaOut = (
-        await db_session.execute(select(CategoriaModel).filter_by(id=id))
+        await db_session.execute(select(CategoriaModel).filter_by(id=str(id)))
     ).scalars().first()
 
     if not categoria:
@@ -58,3 +58,45 @@ async def get(id: UUID4, db_session: DatabaseDependency) -> CategoriaOut:
         )
     
     return categoria
+
+@router.delete(
+    '/{id}', 
+    summary='Deletar uma Categoria pelo id',
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete(id: UUID4, db_session: DatabaseDependency) -> None:
+    categoria = await db_session.execute(select(CategoriaModel).filter_by(id=str(id)))
+    categoria_model = categoria.scalars().first()
+
+    if not categoria_model:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f'Categoria não encontrada no id: {id}'
+        )
+
+    await db_session.delete(categoria_model)
+    await db_session.commit()
+
+
+@router.patch(
+    '/{id}', 
+    summary='Atualizar uma Categoria pelo id',
+    status_code=status.HTTP_200_OK,
+    response_model=CategoriaOut,
+)
+async def patch(id: UUID4, db_session: DatabaseDependency, categoria_in: CategoriaIn = Body(...)) -> CategoriaOut:
+    categoria = await db_session.execute(select(CategoriaModel).filter_by(id=str(id)))
+    categoria_model = categoria.scalars().first()
+
+    if not categoria_model:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f'Categoria não encontrada no id: {id}'
+        )
+
+    for key, value in categoria_in.model_dump().items():
+        setattr(categoria_model, key, value)
+
+    await db_session.commit()
+    
+    return CategoriaOut(id=categoria_model.id, **categoria_model.model_dump())

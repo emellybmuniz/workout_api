@@ -1,10 +1,10 @@
-version: "3"
 services:
   db:
-    image: postgres:11-alpine
+    image: mysql:8.0
     environment:
-      POSTGRES_PASSWORD: workout
-      POSTGRES_USER: workout
-      POSTGRES_DB: workout
+      MYSQL_ROOT_PASSWORD: workout
+      MYSQL_DATABASE: workout
+      MYSQL_USER: workout
+      MYSQL_PASSWORD: workout
     ports:
-      - "5432:5432"
+      - "3306:3306"

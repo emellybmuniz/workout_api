@@ -15,7 +15,7 @@ class AtletaModel(BaseModel):
     altura: Mapped[float] = mapped_column(Float, nullable=False)
     sexo: Mapped[str] = mapped_column(String(1), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    categoria: Mapped['CategoriaModel'] = relationship(back_populates="atleta", lazy='selectin')
-    categoria_id: Mapped[int] = mapped_column(ForeignKey("categorias.pk_id"))
-    centro_treinamento: Mapped['CentroTreinamentoModel'] = relationship(back_populates="atleta", lazy='selectin')
-    centro_treinamento_id: Mapped[int] = mapped_column(ForeignKey("centros_treinamento.pk_id"))
+    categoria: Mapped['CategoriaModel'] = relationship(back_populates="atleta", lazy='selectin') # type: ignore
+    categoria_id: Mapped[int] = mapped_column(ForeignKey("categorias.pk_id")) # FK para tabela categorias
+    centro_treinamento: Mapped['CentroTreinamentoModel'] = relationship(back_populates="atleta", lazy='selectin') # type: ignore
+    centro_treinamento_id: Mapped[int] = mapped_column(ForeignKey("centros_treinamento.pk_id")) # FK para tabela centros_treinamento
